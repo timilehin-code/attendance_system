@@ -1,0 +1,2 @@
+## WEB BASED ATTENDANCE MANAGEMENT SYSTEM 
+ This is a web based attendance management system project that is built using php, and mySql for the department of computer science Lagos state university of education (LASUED) in order for student to be able to mark their  attendance seamlessly
