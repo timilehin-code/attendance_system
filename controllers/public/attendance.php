@@ -1,4 +1,6 @@
 <?php
+
+
 use Models\Public\Attendance;
 
 require_once __DIR__ . "/../../vendor/autoload.php";
@@ -16,31 +18,50 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
     }
 
     try {
-        // Set the matric number
         $attendance->matricNumber = strtoupper($matricNumber);
 
-        if ($attendance->checkMatricNumberExists()) {
-            $studentId = $attendance->getStudentIdByMatricNumber();
-            
-            if ($studentId) {
-                $attendance->studentId = $studentId;
-                $attendance->courseId  = $courseId;
-
-                if ($attendance->recordAttendance()) {
-                    echo json_encode(['status' => 'success', 'message' => 'Attendance recorded successfully.']);
-                } else {
-                    echo json_encode(['status' => 'error', 'message' => 'Failed to record attendance.']);
-                }
-            } else {
-                echo json_encode(['status' => 'error', 'message' => 'Student ID not found.']);
-            }
-        } else {
+        if (!$attendance->checkMatricNumberExists()) {
             echo json_encode(['status' => 'error', 'message' => 'Matriculation number does not exist.']);
+            exit;
+        }
+
+        $studentId = $attendance->getStudentIdByMatricNumber();
+
+        if (!$studentId) {
+            echo json_encode(['status' => 'error', 'message' => 'Student ID not found.']);
+            exit;
+        }
+
+        $attendance->studentId = $studentId;
+        $attendance->courseId  = $courseId;
+
+        // Try to record attendance
+        $result = $attendance->recordAttendance();
+
+        if ($result) {
+            echo json_encode(['status' => 'success', 'message' => 'Attendance recorded successfully.']);
+        } else {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Failed to record attendance - Check server logs'
+            ]);
         }
     } catch (Exception $e) {
-        error_log("Attendance Error: " . $e->getMessage());
-        echo json_encode(['status' => 'error', 'message' => 'Server error occurred.']);
+    $errorMsg = $e->getMessage();
+    
+    // Show user-friendly messages
+    if (strpos($errorMsg, 'already marked attendance') !== false) {
+        echo json_encode([
+            'status' => 'error', 
+            'message' => 'You have already marked attendance for this course today.'
+        ]);
+    } else {
+        echo json_encode([
+            'status' => 'error', 
+            'message' => $errorMsg
+        ]);
     }
+}
 } else {
     echo json_encode(['status' => 'error', 'message' => 'Invalid request method.']);
 }
