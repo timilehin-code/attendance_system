@@ -9,6 +9,8 @@ use PDOException;
 
 class Select_course{
     public string $courseCode;
+
+    public string $session;
     public PDO $conn;
 
     public function __construct($conn)
@@ -29,5 +31,17 @@ class Select_course{
             error_log("Error selecting courses: " . $e->getMessage());
             return false;
        }
-    }   
+    }  
+    
+    public function recordClass(){
+        try{
+            $stmt = $this->conn->prepare("INSERT INTO classes (course_id,session) VALUES (:courseId, :session)");
+            $stmt->bindParam(':courseId', $this->courseCode);
+            $stmt->bindParam(':session', $this->session);
+            return $stmt->execute();
+        }catch(PDOException $e){
+            error_log("Error recording class: " . $e->getMessage());
+            return false;
+        }
+    }
 }

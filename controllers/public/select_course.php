@@ -8,8 +8,9 @@ use Models\Public\Select_course;
 $selectCourse = new Select_course($pdo);
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $courseId = $_POST['course_id'] ?? '';
-    if (empty($courseId)) {
-        echo json_encode(['success' => false, 'message' => 'Course ID is required.']);
+    $session = $_POST['session'] ?? '';
+    if (empty($courseId) || empty($session)) {
+        echo json_encode(['success' => false, 'message' => 'Course ID and session are required.']);
         exit;
     }
 
@@ -23,8 +24,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     if ($courseExists) {
+        $selectCourse->courseCode = $courseId;
+        $selectCourse->session = $session;
+        $selectCourse->recordClass();
+
         echo json_encode(['success' => true, 'message' => 'Course selected successfully.']);
-        header("Location: ../../views/public/index.php?course_id=" . urlencode($courseId) . "&course_code=" . urlencode($course['course_code']) . "&course_title=" . urlencode($course['course_title']));
+        session_start();
+        $_SESSION['course_id'] = $courseId;
+        $_SESSION['course_code'] = $course['course_code'];
+        $_SESSION['session'] = $session;
+        header("Location: ../../views/public/index.php");
         exit;
     } else {
         echo json_encode(['success' => false, 'message' => 'Course not found.']);

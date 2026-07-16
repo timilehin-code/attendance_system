@@ -66,7 +66,10 @@ $pdo = require_once __DIR__ . "/../../config/config.php";
                         ?>
                     </select>
                 </div>
-
+                <div class="mb-4">
+                    <label class="form-label fw-medium">Session</label>
+                    <input type="text" class="form-control" id="session" name="session" placeHolder = "2025/2026" required>
+                </div>
                 <button type="submit" class="btn btn-select w-100">
                     Select Course
                 </button>

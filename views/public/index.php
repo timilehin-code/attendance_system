@@ -1,10 +1,11 @@
 <?php
-if (!isset($_GET['course_id'])) {
+session_start();
+if (!isset($_SESSION['course_id'])) {
     header("Location: select_course.php");
     exit();
 }
-$courseCode = $_GET['course_code'] ?? "unknown course";
-$courseId = $_GET['course_id'] ?? null;
+$courseCode = $_SESSION['course_code'] ?? "unknown course";
+$courseId = $_SESSION['course_id'] ?? null;
 ?>
 <!DOCTYPE html>
 <html lang="en">
