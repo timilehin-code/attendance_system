@@ -1,3 +1,11 @@
+<?php
+if (!isset($_GET['course_id'])) {
+    header("Location: select_course.php");
+    exit();
+}
+$courseCode = $_GET['course_code'] ?? "unknown course";
+$courseId = $_GET['course_id'] ?? null;
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -74,12 +82,13 @@
         <!-- Header -->
         <div class="form-header">
             <h2>Student attendance</h2>
+            <p class="text-muted mt-2 mb-0">Welcome to <?= $courseCode ?> lecture </p>
             <p class="text-muted mt-2 mb-0">Enter your matriculation number</p>
         </div>
 
         <!-- Form Body -->
         <div class="form-body">
-            <form id="matricForm" method="">
+            <form id="matricForm" method="POST" action="../../controllers/public/attendance.php">
                 <div class="mb-4">
                     <label for="matricNumber" class="form-label fw-medium text-dark">
                         Matriculation Number
@@ -88,11 +97,13 @@
                         type="text"
                         class="form-control form-control-lg matric-input"
                         id="matricNumber"
+                        name="matric_number"
                         placeholder="U20123456"
                         autofocus
                         required
                         pattern="[A-Za-z0-9]+"
                         maxlength="15">
+                    <input type="hidden" name="course_id" value="<?= htmlspecialchars($courseId) ?>">
                 </div>
 
                 <button type="submit" class="btn btn-submit w-100">
@@ -107,8 +118,6 @@
 
     <script>
         document.getElementById('matricForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
             const matric = document.getElementById('matricNumber').value.trim().toUpperCase();
 
             if (matric) {
@@ -122,15 +131,7 @@
                     Verifying...
                 `;
 
-                // Simulate API call
-                setTimeout(() => {
-                    alert(`✅ Matric number "${matric}" submitted successfully!`);
 
-                    // Reset form
-                    btn.disabled = false;
-                    btn.textContent = originalText;
-                    this.reset();
-                }, 1500);
             }
         });
 
