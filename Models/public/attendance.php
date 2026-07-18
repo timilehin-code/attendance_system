@@ -53,55 +53,54 @@ class Attendance
             return null;
         }
     }
-   private function hasAlreadyMarkedToday(): bool
-{
-    try {
-        $stmt = $this->conn->prepare("
+    private function hasAlreadyMarkedToday(): bool
+    {
+        try {
+            $stmt = $this->conn->prepare("
             SELECT COUNT(*) FROM attendance 
             WHERE student_id = :studentId 
               AND course_id = :courseId 
               AND DATE(attendance_time) = CURDATE()
         ");
-        $stmt->bindParam(':studentId', $this->studentId, PDO::PARAM_INT);
-        $stmt->bindParam(':courseId', $this->courseId, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchColumn() > 0;
-    } catch (PDOException $e) {
-        error_log("Error checking today's attendance: " . $e->getMessage());
-        return false;
-    }
-}
-
-public function recordAttendance(): bool
-{
-    try {
-        // Check if already marked today
-        if ($this->hasAlreadyMarkedToday()) {
-            // Throw exception so controller can catch and show nice message
-            throw new PDOException("You have already marked attendance for this course today.");
+            $stmt->bindParam(':studentId', $this->studentId, PDO::PARAM_INT);
+            $stmt->bindParam(':courseId', $this->courseId, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchColumn() > 0;
+        } catch (PDOException $e) {
+            error_log("Error checking today's attendance: " . $e->getMessage());
+            return false;
         }
+    }
 
-        $stmt = $this->conn->prepare("
+    public function recordAttendance(): bool
+    {
+        try {
+            // Check if already marked today
+            if ($this->hasAlreadyMarkedToday()) {
+                // Throw exception so controller can catch and show nice message
+                throw new PDOException("You have already marked attendance for this course today.");
+            }
+
+            $stmt = $this->conn->prepare("
             INSERT INTO attendance (student_id, course_id, attendance_time) 
             VALUES (:studentId, :courseId, NOW())
         ");
 
-        $stmt->bindParam(':studentId', $this->studentId, PDO::PARAM_INT);
-        $stmt->bindParam(':courseId', $this->courseId, PDO::PARAM_INT);
+            $stmt->bindParam(':studentId', $this->studentId, PDO::PARAM_INT);
+            $stmt->bindParam(':courseId', $this->courseId, PDO::PARAM_INT);
 
-        $success = $stmt->execute();
+            $success = $stmt->execute();
 
-        if (!$success) {
-            $errorInfo = $stmt->errorInfo();
-            $errorMsg = $errorInfo[2] ?? 'Unknown database error';
-            throw new PDOException("Failed to record attendance: " . $errorMsg);
+            if (!$success) {
+                $errorInfo = $stmt->errorInfo();
+                $errorMsg = $errorInfo[2] ?? 'Unknown database error';
+                throw new PDOException("Failed to record attendance: " . $errorMsg);
+            }
+
+            return true;
+        } catch (PDOException $e) {
+            error_log("Attendance Error: " . $e->getMessage());
+            throw $e;   // Let controller handle the message
         }
-
-        return true;
-
-    } catch (PDOException $e) {
-        error_log("Attendance Error: " . $e->getMessage());
-        throw $e;   // Let controller handle the message
     }
-}
 }
