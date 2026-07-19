@@ -2,6 +2,8 @@
 
 
 use Models\Public\Attendance;
+session_start();
+$classid = $_SESSION['class_id'] ?? null;
 
 require_once __DIR__ . "/../../vendor/autoload.php";
 $pdo = require_once __DIR__ . "/../../config/config.php";
@@ -34,6 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
 
         $attendance->studentId = $studentId;
         $attendance->courseId  = $courseId;
+        $attendance->classId   = $classid;
 
         // Try to record attendance
         $result = $attendance->recordAttendance();
