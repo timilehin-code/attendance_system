@@ -26,13 +26,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($courseExists) {
         $selectCourse->courseCode = $courseId;
         $selectCourse->session = $session;
-        $selectCourse->recordClass();
-
-        echo json_encode(['success' => true, 'message' => 'Course selected successfully.']);
+        $record = $selectCourse->recordClass();
         session_start();
         $_SESSION['course_id'] = $courseId;
         $_SESSION['course_code'] = $course['course_code'];
         $_SESSION['session'] = $session;
+        $_SESSION['class_id'] = $record;
         header("Location: ../../views/public/index.php");
         exit;
     } else {

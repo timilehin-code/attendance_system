@@ -38,7 +38,13 @@ class Select_course{
             $stmt = $this->conn->prepare("INSERT INTO classes (course_id,session) VALUES (:courseId, :session)");
             $stmt->bindParam(':courseId', $this->courseCode);
             $stmt->bindParam(':session', $this->session);
-            return $stmt->execute();
+            if($stmt->execute()) {
+                $insertId = $this->conn->lastInsertId();
+                return $insertId;
+            } else {
+                error_log("Error executing recordClass: " . implode(", ", $stmt->errorInfo()));
+                return false;
+            }
         }catch(PDOException $e){
             error_log("Error recording class: " . $e->getMessage());
             return false;
