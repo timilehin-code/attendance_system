@@ -75,6 +75,83 @@ $courseId = $_SESSION['course_id'] ?? null;
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(33, 37, 41, 0.2);
         }
+
+        /* Modern Alert */
+        .modern-alert {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px 16px;
+            border-radius: 10px;
+            margin-bottom: 1.25rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            animation: slideIn 0.35s ease;
+            position: relative;
+        }
+
+        .modern-alert.error {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .modern-alert .alert-icon {
+            flex-shrink: 0;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            color: white;
+            background: #ef4444;
+            margin-top: 1px;
+        }
+
+        .modern-alert .alert-text {
+            flex: 1;
+            line-height: 1.4;
+        }
+
+        .modern-alert .alert-close {
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            line-height: 1;
+            color: inherit;
+            opacity: 0.5;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .modern-alert.success {
+            background: #ecfdf5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .modern-alert.success .alert-icon {
+            background: #10b981;
+        }
+
+        .modern-alert .alert-close:hover {
+            opacity: 1;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 
@@ -92,22 +169,24 @@ $courseId = $_SESSION['course_id'] ?? null;
             <form id="matricForm" method="POST" action="../../controllers/public/attendance.php">
                 <!-- Display error message if exists -->
                 <?php if (isset($_SESSION['error'])): ?>
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <?php echo $_SESSION['error']; ?>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <div class="modern-alert error" id="searchAlert">
+                        <div class="alert-icon">!</div>
+                        <div class="alert-text"><?php echo htmlspecialchars($_SESSION['error']); ?></div>
+                        <button type="button" class="alert-close" onclick="document.getElementById('searchAlert').remove()">&times;</button>
                     </div>
                     <?php unset($_SESSION['error']); ?>
                 <?php endif; ?>
 
                 <!-- Display success message if exists -->
                 <?php if (isset($_SESSION['success'])): ?>
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <?php echo $_SESSION['success']; ?>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <div class="modern-alert success" id="searchSuccessAlert">
+                        <div class="alert-icon">✓</div>
+                        <div class="alert-text"><?php echo htmlspecialchars($_SESSION['success']); ?></div>
+                        <button type="button" class="alert-close" onclick="document.getElementById('searchSuccessAlert').remove()">&times;</button>
                     </div>
                     <?php unset($_SESSION['success']); ?>
-                <?php endif; ?>   
-            <div class="mb-4">
+                <?php endif; ?>
+                <div class="mb-4">
                     <label for="matricNumber" class="form-label fw-medium text-dark">
                         Matriculation Number
                     </label>
