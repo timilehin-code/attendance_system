@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -48,6 +51,14 @@
       <!-- Right side: Input Form -->
       <div class="col-md-8">
         <form action="../../controllers/public/search.php" method="POST">
+            <!-- Display error message if exists -->
+            <?php if (isset($_SESSION['error'])): ?>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <?php echo $_SESSION['error']; ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <?php unset($_SESSION['error']); ?>
+            <?php endif; ?>
           <div class="input-group">
             <input 
               type="text" 
