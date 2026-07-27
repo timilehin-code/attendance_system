@@ -15,22 +15,26 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
     $courseId     = trim($_POST['course_id'] ?? '');
 
     if (empty($matricNumber) || empty($courseId)) {
-        echo json_encode(['status' => 'error', 'message' => 'Matric number and course are required.']);
-        exit;
+
+    $_SESSION['error'] = 'Matriculation number and course ID are required.';
+    header('Location: ../../views/public/index.php');
+    exit;
     }
 
     try {
         $attendance->matricNumber = strtoupper($matricNumber);
 
         if (!$attendance->checkMatricNumberExists()) {
-            echo json_encode(['status' => 'error', 'message' => 'Matriculation number does not exist.']);
+           $_SESSION['error'] = 'Matriculation number does not exist.';
+           header('Location: ../../views/public/index.php');
             exit;
         }
 
         $studentId = $attendance->getStudentIdByMatricNumber();
 
         if (!$studentId) {
-            echo json_encode(['status' => 'error', 'message' => 'Student ID not found.']);
+            $_SESSION['error'] = 'Student ID not found for the provided matriculation number.';
+            header('Location: ../../views/public/index.php');
             exit;
         }
 
@@ -42,29 +46,30 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
         $result = $attendance->recordAttendance();
 
         if ($result) {
-            echo json_encode(['status' => 'success', 'message' => 'Attendance recorded successfully.']);
+           $_SESSION['success'] = 'Attendance recorded successfully.';
+           header('Location: ../../views/public/index.php');
+            exit;
         } else {
-            echo json_encode([
-                'status' => 'error',
-                'message' => 'Failed to record attendance - Check server logs'
-            ]);
+            $_SESSION['error'] = 'Failed to record attendance. Please try again.';
+            header('Location: ../../views/public/index.php');
+            exit;
         }
     } catch (Exception $e) {
     $errorMsg = $e->getMessage();
     
     // Show user-friendly messages
     if (strpos($errorMsg, 'already marked attendance') !== false) {
-        echo json_encode([
-            'status' => 'error', 
-            'message' => 'You have already marked attendance for this course today.'
-        ]);
+       $_SESSION['error'] = 'You have already marked your attendance for this class.';
+       header('Location: ../../views/public/index.php');
+       exit;
     } else {
-        echo json_encode([
-            'status' => 'error', 
-            'message' => $errorMsg
-        ]);
+         $_SESSION['error'] = 'An unexpected error occurred. Please try again later.';
+         header('Location: ../../views/public/index.php');
+         exit;
     }
 }
 } else {
-    echo json_encode(['status' => 'error', 'message' => 'Invalid request method.']);
+    $_SESSION['error'] = 'Invalid request method.';
+    header('Location: ../../views/public/index.php');
+    exit;
 }

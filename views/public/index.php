@@ -90,7 +90,24 @@ $courseId = $_SESSION['course_id'] ?? null;
         <!-- Form Body -->
         <div class="form-body">
             <form id="matricForm" method="POST" action="../../controllers/public/attendance.php">
-                <div class="mb-4">
+                <!-- Display error message if exists -->
+                <?php if (isset($_SESSION['error'])): ?>
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <?php echo $_SESSION['error']; ?>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <?php unset($_SESSION['error']); ?>
+                <?php endif; ?>
+
+                <!-- Display success message if exists -->
+                <?php if (isset($_SESSION['success'])): ?>
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <?php echo $_SESSION['success']; ?>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <?php unset($_SESSION['success']); ?>
+                <?php endif; ?>   
+            <div class="mb-4">
                     <label for="matricNumber" class="form-label fw-medium text-dark">
                         Matriculation Number
                     </label>
