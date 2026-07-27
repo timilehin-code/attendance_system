@@ -1,8 +1,10 @@
 <?php
 
 use Models\Admin\Course_reg;
+
 require_once __DIR__ . "/../../vendor/autoload.php";
 $pdo = require_once __DIR__ . "/../../config/config.php";
+session_start();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $courseCode  = strtoupper(trim($_POST['course_code'] ?? ''));
@@ -10,7 +12,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Basic validation
     if (empty($courseCode) || empty($courseTitle)) {
-        echo json_encode(['success' => false, 'message' => 'All fields are required.']);
+        $_SESSION['error'] = 'All fields are required.';
+        header('Location: ../../views/admin/course_reg.php');
         exit;
     }
 
@@ -22,32 +25,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Check if course already exists
         if ($courseReg->checkCourseExist()) {
-            echo json_encode([
-                'success' => false, 
-                'message' => 'Course code or title already exists.'
-            ]);
+            $_SESSION['error'] = 'Course code or title already exists.';
+            header('Location: ../../views/admin/course_reg.php');
             exit;
         }
 
         // Register the course
         if ($courseReg->registerCourse()) {
-            echo json_encode([
-                'success' => true, 
-                'message' => 'Course registered successfully.'
-            ]);
+            $_SESSION['success'] = 'Course registered successfully.';
+            header('Location: ../../views/admin/course_reg.php');
+            exit;
         } else {
-            echo json_encode([
-                'success' => false, 
-                'message' => 'Failed to register course.'
-            ]);
+            $_SESSION['error'] = 'Failed to register course.';
+            header('Location: ../../views/admin/course_reg.php');
+            exit;
         }
     } catch (Exception $e) {
         error_log("Registration Error: " . $e->getMessage());
-        echo json_encode([
-            'success' => false, 
-            'message' => 'Server error occurred.'
-        ]);
+        $_SESSION['error'] = 'Server error occurred.';
+        header('Location: ../../views/admin/course_reg.php');
+        exit;
     }
 } else {
-    echo json_encode(['success' => false, 'message' => 'Invalid request method.']);
+    $_SESSION['error'] = 'Invalid request method.';
+    header('Location: ../../views/admin/course_reg.php');
+    exit;
 }
