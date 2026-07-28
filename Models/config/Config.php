@@ -25,7 +25,7 @@ class Config
         }
 
         try {
-            $pdo = new PDO("mysql:host=$this->host;dbname=$this->dbName", $this->user, $this->password);
+            $pdo = new PDO("pgsql:host=$this->host;dbname=$this->dbName;sslmode=require", $this->user, $this->password);
             $this->pdo = $pdo;
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             error_log("Database connection successful");
