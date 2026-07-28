@@ -3,9 +3,10 @@ FROM php:8.2-apache
 # Install system dependencies + common PHP extensions
 RUN apt-get update && apt-get install -y \
     libzip-dev \
+    libpq-dev \
     unzip \
     git \
-    && docker-php-ext-install pdo pdo_mysql zip \
+    && docker-php-ext-install pdo pdo_pgsql zip \
     && a2enmod rewrite headers \
     && rm -rf /var/lib/apt/lists/*
 
